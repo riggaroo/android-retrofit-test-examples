@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Call<QuoteOfTheDayResponse> call =
-                service.getQuoteOfTheDay();
+                service.getQuoteOfTheDay("test");
 
         call.enqueue(new Callback<QuoteOfTheDayResponse>() {
 

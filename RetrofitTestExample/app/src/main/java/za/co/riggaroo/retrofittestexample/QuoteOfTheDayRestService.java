@@ -2,6 +2,7 @@ package za.co.riggaroo.retrofittestexample;
 
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Query;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
 /**
@@ -11,6 +12,6 @@ import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 public interface QuoteOfTheDayRestService {
 
     @GET("/qod.json")
-    Call<QuoteOfTheDayResponse> getQuoteOfTheDay();
+    Call<QuoteOfTheDayResponse> getQuoteOfTheDay(@Query("apiKey") String apiKey);
 
 }

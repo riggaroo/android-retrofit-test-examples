@@ -26,10 +26,11 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.11'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
     compile 'com.squareup.retrofit:converter-jackson:2.0.0-beta2'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     debugCompile 'com.squareup.retrofit:retrofit-mock:2.0.0-beta2'
+    debugCompile ('com.squareup.okhttp:mockwebserver:2.5.0')
 }
