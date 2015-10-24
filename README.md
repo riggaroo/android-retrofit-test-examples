@@ -1,2 +1,2 @@
 # android-retrofit-test-examples
-Examples using different mechanisms of testing for Retrofit in Android
+Example usage for testing different server responses from an API. This is using Retrofit 2.
