@@ -1,23 +1,28 @@
 package za.co.riggaroo.retrofittestexample;
 
 import android.test.InstrumentationTestCase;
+import android.test.suitebuilder.annotation.SmallTest;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.ResponseBody;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import java.lang.annotation.Annotation;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import retrofit.Call;
+import retrofit.Converter;
 import retrofit.JacksonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 import retrofit.mock.CallBehaviorAdapter;
 import retrofit.mock.MockRetrofit;
 import retrofit.mock.NetworkBehavior;
+import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
 /**
@@ -46,7 +51,7 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
     }
 
 
-    @Test
+    @SmallTest
     public void testRandomQuoteRetrieval() throws Exception {
         QuoteOfTheDayRestService mockQodService = new MockQuoteOfTheDayService(retrofit);
 
@@ -62,4 +67,23 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
 
     }
 
+    @SmallTest
+    public void testFailedQuoteRetrieval() throws Exception {
+        QuoteOfTheDayRestService mockQodService = new MockFailedQODService(retrofit);
+
+        qodService = mockRetrofit.create(QuoteOfTheDayRestService.class, mockQodService);
+
+        //Actual Test
+        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay();
+        Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
+
+        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
+        QuoteOfTheDayErrorResponse error = errorConverter.convert(quoteOfTheDayResponse.errorBody());
+
+        //Asserting response
+        Assert.assertFalse(quoteOfTheDayResponse.isSuccess());
+        Assert.assertEquals(404, error.getError().getCode().intValue());
+        Assert.assertEquals("Quote Not Found", error.getError().getMessage());
+
+    }
 }
