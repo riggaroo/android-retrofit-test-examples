@@ -10,6 +10,8 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
     buildTypes {
         release {
@@ -26,11 +28,15 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.squareup.retrofit:retrofit:2.0.0-beta2'
     compile 'com.squareup.retrofit:converter-jackson:2.0.0-beta2'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
-    debugCompile 'com.squareup.retrofit:retrofit-mock:2.0.0-beta2'
-    debugCompile ('com.squareup.okhttp:mockwebserver:2.5.0')
+    androidTestCompile 'com.squareup.retrofit:retrofit-mock:2.0.0-beta2'
+    androidTestCompile ('com.squareup.okhttp:mockwebserver:2.5.0')
+    androidTestCompile 'com.android.support.test:runner:0.4'
+    androidTestCompile 'com.android.support.test:rules:0.4'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestCompile 'com.squareup.spoon:spoon-client:1.2.0'
 }

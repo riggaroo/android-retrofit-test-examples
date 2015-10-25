@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import retrofit.Call;
 import retrofit.Retrofit;
-import retrofit.http.Query;
 import retrofit.mock.Calls;
 import za.co.riggaroo.retrofittestexample.pojo.Contents;
 import za.co.riggaroo.retrofittestexample.pojo.Quote;
@@ -22,7 +21,7 @@ public class MockQuoteOfTheDayService implements QuoteOfTheDayRestService {
     }
 
     @Override
-    public Call<QuoteOfTheDayResponse> getQuoteOfTheDay(@Query("apiKey") String apiKey) {
+    public Call<QuoteOfTheDayResponse> getQuoteOfTheDay() {
         QuoteOfTheDayResponse quoteOfTheDayResponse = new QuoteOfTheDayResponse();
         Contents contents = new Contents();
         Quote quote = new Quote();

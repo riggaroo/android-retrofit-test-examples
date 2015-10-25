@@ -62,7 +62,7 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
         QuoteOfTheDayRestService qodService = mockRetrofit.create(QuoteOfTheDayRestService.class, mockQodService);
 
         //Actual Test
-        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay("");
+        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay();
         Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
 
         //Asserting response
@@ -74,11 +74,11 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
     @SmallTest
     public void testQuoteUnauthorised() throws Exception {
         //Setup
-        String jsonResponseFileName = "quote_401_unauthorised.json";
+        String jsonResponseFileName = "quote_404_not_found.json";
         MockWebServer server = new MockWebServer();
         server.start();
         server.enqueue(new MockResponse()
-                .setResponseCode(401)
+                .setResponseCode(404)
                 .setBody(RestServiceTestHelper.getStringFromFile(getInstrumentation().getContext(), jsonResponseFileName)));
 
         Retrofit retrofit2 = new Retrofit.Builder().baseUrl(server.url("/"))
@@ -90,7 +90,7 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
 
 
         //Actual Test
-        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay("");
+        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay();
         Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
         Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter =
                 retrofit.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
@@ -99,8 +99,8 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
 
         //Asserting response
         Assert.assertFalse(quoteOfTheDayResponse.isSuccess());
-        Assert.assertEquals(401, quoteOfTheDayResponse.code());
-        Assert.assertEquals("Unauthorized", error.getError().getMessage());
+        Assert.assertEquals(404, quoteOfTheDayResponse.code());
+        Assert.assertEquals("Quote Not found", error.getError().getMessage());
 
     }
 }
