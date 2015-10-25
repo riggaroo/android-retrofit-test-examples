@@ -7,16 +7,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.ResponseBody;
-import com.squareup.okhttp.mockwebserver.MockResponse;
 
 import retrofit.Call;
-import retrofit.JacksonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
-import retrofit.mock.CallBehaviorAdapter;
 import retrofit.mock.Calls;
-import za.co.riggaroo.retrofittestexample.pojo.*;
 import za.co.riggaroo.retrofittestexample.pojo.Error;
+import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
+import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
 /**
  * @author rebeccafranks
