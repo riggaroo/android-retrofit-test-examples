@@ -8,13 +8,19 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.ResponseBody;
+
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 
 import retrofit.Call;
 import retrofit.Callback;
+import retrofit.Converter;
 import retrofit.JacksonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 import za.co.riggaroo.retrofittestexample.interceptor.LoggingInterceptor;
+import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
 public class MainActivity extends AppCompatActivity {
@@ -64,19 +70,27 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccess()) {
                     textViewQuoteOfTheDay.setText(response.body().getContents().getQuotes().get(0).getQuote());
                 } else {
-                    showRetry(response.code());
+                    try {
+                        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
+                        QuoteOfTheDayErrorResponse error = errorConverter.convert(response.errorBody());
+                        showRetry(String.valueOf(error.getError().getMessage()));
+
+                    } catch (IOException e) {
+                        Log.e(TAG, "IOException parsing error:", e);
+                    }
+
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                showRetry(getString(R.string.failed_to_load_quote));
             }
         });
     }
 
-    private void showRetry(int httpCode) {
-        textViewQuoteOfTheDay.setText(String.valueOf(httpCode));
+    private void showRetry(String error) {
+        textViewQuoteOfTheDay.setText(error);
         buttonRetry.setVisibility(View.VISIBLE);
 
     }

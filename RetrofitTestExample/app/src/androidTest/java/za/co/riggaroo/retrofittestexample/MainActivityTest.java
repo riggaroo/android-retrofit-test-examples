@@ -60,15 +60,17 @@ public class MainActivityTest extends InstrumentationTestCase {
 
     @Test
     public void testRetryButtonShowsWhenError() throws Exception {
+        String fileName = "quote_404_not_found.json";
+
         server.enqueue(new MockResponse()
                 .setResponseCode(404)
-                .setBody(""));
+                .setBody(RestServiceTestHelper.getStringFromFile(getInstrumentation().getContext(), fileName)));
 
         Intent intent = new Intent();
         mActivityRule.launchActivity(intent);
 
         onView(withId(R.id.button_retry)).check(matches(isDisplayed()));
-        onView(withText("404")).check(matches(isDisplayed()));
+        onView(withText("Quote Not found")).check(matches(isDisplayed()));
     }
 
     @After
