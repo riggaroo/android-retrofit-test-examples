@@ -7,18 +7,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Converter;
-import retrofit.JacksonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Converter;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 import za.co.riggaroo.retrofittestexample.interceptor.LoggingInterceptor;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         OkHttpClient client = new OkHttpClient();
-        client.interceptors().add(new LoggingInterceptor());
+       // client.interceptors().add(new LoggingInterceptor());
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(QuoteOfTheDayConstants.BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create())
@@ -64,28 +64,27 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<QuoteOfTheDayResponse>() {
 
             @Override
-            public void onResponse(Response<QuoteOfTheDayResponse> response, Retrofit retrofit) {
-                Log.d(TAG, "onResponse quoteOfTheDay");
-
-                if (response.isSuccess()) {
+            public void onResponse(Call<QuoteOfTheDayResponse> call, Response<QuoteOfTheDayResponse> response) {
+                if (response.isSuccessful()) {
                     textViewQuoteOfTheDay.setText(response.body().getContents().getQuotes().get(0).getQuote());
                 } else {
-                    try {
-                        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
-                        QuoteOfTheDayErrorResponse error = errorConverter.convert(response.errorBody());
-                        showRetry(String.valueOf(error.getError().getMessage()));
+                   /* try {*/
+                      //  Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = re.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
+                      //  QuoteOfTheDayErrorResponse error = errorConverter.convert(response.errorBody());
+                        showRetry(String.valueOf(response.code()));
 
-                    } catch (IOException e) {
+                   /* } catch (IOException e) {
                         Log.e(TAG, "IOException parsing error:", e);
-                    }
+                    }*/
 
                 }
             }
 
             @Override
-            public void onFailure(Throwable t) {
-                showRetry(getString(R.string.failed_to_load_quote));
+            public void onFailure(Call<QuoteOfTheDayResponse> call, Throwable t) {
+
             }
+
         });
     }
 

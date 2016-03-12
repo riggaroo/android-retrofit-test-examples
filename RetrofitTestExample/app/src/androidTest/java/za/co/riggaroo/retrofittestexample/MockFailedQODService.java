@@ -5,27 +5,29 @@ import android.util.Log;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.ResponseBody;
 
-import retrofit.Call;
-import retrofit.Response;
-import retrofit.Retrofit;
-import retrofit.mock.Calls;
+import okhttp3.MediaType;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.mock.Calls;
 import za.co.riggaroo.retrofittestexample.pojo.Error;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
+import retrofit2.mock.BehaviorDelegate;
 /**
  * @author rebeccafranks
  * @since 15/10/25.
  */
 public class MockFailedQODService implements QuoteOfTheDayRestService {
     private static final String TAG = "MockFailedQOD";
-    private final Retrofit retrofit;
+    private final BehaviorDelegate<QuoteOfTheDayRestService> delegate;
 
-    public MockFailedQODService(Retrofit retrofit) {
-        this.retrofit = retrofit;
+    public MockFailedQODService(BehaviorDelegate<QuoteOfTheDayRestService> restServiceBehaviorDelegate) {
+        this.delegate = restServiceBehaviorDelegate;
+
     }
 
     @Override
@@ -40,8 +42,8 @@ public class MockFailedQODService implements QuoteOfTheDayRestService {
         String json = "";
         try {
             json = ow.writeValueAsString(quoteOfTheDayErrorResponse);
-            Response response = Response.error(404, ResponseBody.create(MediaType.parse("application/json"),json));
-            return Calls.response(response, retrofit);
+            Response response = Response.error(404, ResponseBody.create(MediaType.parse("application/json") ,json));
+            return delegate.returningResponse(response).getQuoteOfTheDay();
         } catch (JsonProcessingException e) {
             Log.e(TAG, "JSON Processing exception:",e);
             return Calls.failure(e);

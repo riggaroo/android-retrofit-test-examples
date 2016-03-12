@@ -1,7 +1,7 @@
 package za.co.riggaroo.retrofittestexample;
 
-import retrofit.Call;
-import retrofit.http.GET;
+import retrofit2.Call;
+import retrofit2.http.GET;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
 /**

@@ -3,25 +3,20 @@ package za.co.riggaroo.retrofittestexample;
 import android.test.InstrumentationTestCase;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.ResponseBody;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
-
 import java.lang.annotation.Annotation;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import retrofit.Call;
-import retrofit.Converter;
-import retrofit.JacksonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
-import retrofit.mock.CallBehaviorAdapter;
-import retrofit.mock.MockRetrofit;
-import retrofit.mock.NetworkBehavior;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Converter;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
+import retrofit2.mock.BehaviorDelegate;
+import retrofit2.mock.MockRetrofit;
+import retrofit2.mock.NetworkBehavior;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayErrorResponse;
 import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 
@@ -32,7 +27,6 @@ import za.co.riggaroo.retrofittestexample.pojo.QuoteOfTheDayResponse;
 public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
     private MockRetrofit mockRetrofit;
     private Retrofit retrofit;
-    private QuoteOfTheDayRestService qodService;
 
     @Override
     public void setUp() throws Exception {
@@ -44,44 +38,42 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
 
         NetworkBehavior behavior = NetworkBehavior.create();
 
-        ExecutorService bg = Executors.newSingleThreadExecutor();
-
-        mockRetrofit = new MockRetrofit(behavior, new CallBehaviorAdapter(retrofit, bg));
-
+        mockRetrofit = new MockRetrofit.Builder(retrofit)
+                .networkBehavior(behavior)
+                .build();
     }
 
 
     @SmallTest
     public void testRandomQuoteRetrieval() throws Exception {
-        QuoteOfTheDayRestService mockQodService = new MockQuoteOfTheDayService(retrofit);
+        BehaviorDelegate<QuoteOfTheDayRestService> delegate = mockRetrofit.create(QuoteOfTheDayRestService.class);
+        QuoteOfTheDayRestService mockQodService = new MockQuoteOfTheDayService(delegate);
 
-        qodService = mockRetrofit.create(QuoteOfTheDayRestService.class, mockQodService);
 
         //Actual Test
-        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay();
+        Call<QuoteOfTheDayResponse> quote = mockQodService.getQuoteOfTheDay();
         Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
 
         //Asserting response
-        Assert.assertTrue(quoteOfTheDayResponse.isSuccess());
+        Assert.assertTrue(quoteOfTheDayResponse.isSuccessful());
         Assert.assertEquals("Always code as if the guy who ends up maintaining your code will be a violent psychopath who knows where you live.", quoteOfTheDayResponse.body().getContents().getQuotes().get(0).getQuote());
 
     }
 
     @SmallTest
     public void testFailedQuoteRetrieval() throws Exception {
-        QuoteOfTheDayRestService mockQodService = new MockFailedQODService(retrofit);
-
-        qodService = mockRetrofit.create(QuoteOfTheDayRestService.class, mockQodService);
+        BehaviorDelegate<QuoteOfTheDayRestService> delegate = mockRetrofit.create(QuoteOfTheDayRestService.class);
+        MockFailedQODService mockQodService = new MockFailedQODService(delegate);
 
         //Actual Test
-        Call<QuoteOfTheDayResponse> quote = qodService.getQuoteOfTheDay();
+        Call<QuoteOfTheDayResponse> quote = mockQodService.getQuoteOfTheDay();
         Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
 
-        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
+        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseBodyConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
         QuoteOfTheDayErrorResponse error = errorConverter.convert(quoteOfTheDayResponse.errorBody());
 
         //Asserting response
-        Assert.assertFalse(quoteOfTheDayResponse.isSuccess());
+        Assert.assertFalse(quoteOfTheDayResponse.isSuccessful());
         Assert.assertEquals(404, error.getError().getCode().intValue());
         Assert.assertEquals("Quote Not Found", error.getError().getMessage());
 
