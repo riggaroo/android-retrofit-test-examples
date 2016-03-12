@@ -68,13 +68,13 @@ public class QuoteOfTheDayMockAdapterTest extends InstrumentationTestCase {
         //Actual Test
         Call<QuoteOfTheDayResponse> quote = mockQodService.getQuoteOfTheDay();
         Response<QuoteOfTheDayResponse> quoteOfTheDayResponse = quote.execute();
+        Assert.assertFalse(quoteOfTheDayResponse.isSuccessful());
 
         Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseBodyConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
         QuoteOfTheDayErrorResponse error = errorConverter.convert(quoteOfTheDayResponse.errorBody());
 
         //Asserting response
-        Assert.assertFalse(quoteOfTheDayResponse.isSuccessful());
-        Assert.assertEquals(404, error.getError().getCode().intValue());
+        Assert.assertEquals(404, quoteOfTheDayResponse.code());
         Assert.assertEquals("Quote Not Found", error.getError().getMessage());
 
     }

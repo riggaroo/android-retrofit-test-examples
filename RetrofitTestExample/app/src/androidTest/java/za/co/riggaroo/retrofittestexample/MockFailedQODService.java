@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import java.io.IOException;
+
 import okhttp3.MediaType;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -43,7 +45,8 @@ public class MockFailedQODService implements QuoteOfTheDayRestService {
         try {
             json = ow.writeValueAsString(quoteOfTheDayErrorResponse);
             Response response = Response.error(404, ResponseBody.create(MediaType.parse("application/json") ,json));
-            return delegate.returningResponse(response).getQuoteOfTheDay();
+            return delegate.returning(Calls.response(response)).getQuoteOfTheDay();
+           // return delegate.returningResponse(response).getQuoteOfTheDay();
         } catch (JsonProcessingException e) {
             Log.e(TAG, "JSON Processing exception:",e);
             return Calls.failure(e);

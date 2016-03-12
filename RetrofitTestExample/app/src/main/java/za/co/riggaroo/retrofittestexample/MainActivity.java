@@ -7,12 +7,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.squareup.okhttp.ResponseBody;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Converter;
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private QuoteOfTheDayRestService service;
+    private Retrofit retrofit;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         OkHttpClient client = new OkHttpClient();
-       // client.interceptors().add(new LoggingInterceptor());
-        Retrofit retrofit = new Retrofit.Builder()
+        // client.interceptors().add(new LoggingInterceptor());
+        retrofit = new Retrofit.Builder()
                 .baseUrl(QuoteOfTheDayConstants.BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create())
                 .client(client)
@@ -68,24 +70,25 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     textViewQuoteOfTheDay.setText(response.body().getContents().getQuotes().get(0).getQuote());
                 } else {
-                   /* try {*/
-                      //  Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = re.responseConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
-                      //  QuoteOfTheDayErrorResponse error = errorConverter.convert(response.errorBody());
-                        showRetry(String.valueOf(response.code()));
+                    try {
+                        Converter<ResponseBody, QuoteOfTheDayErrorResponse> errorConverter = retrofit.responseBodyConverter(QuoteOfTheDayErrorResponse.class, new Annotation[0]);
+                        QuoteOfTheDayErrorResponse error = errorConverter.convert(response.errorBody());
+                        showRetry(error.getError().getMessage());
 
-                   /* } catch (IOException e) {
+                    } catch (IOException e) {
                         Log.e(TAG, "IOException parsing error:", e);
-                    }*/
+                    }
 
                 }
             }
 
             @Override
             public void onFailure(Call<QuoteOfTheDayResponse> call, Throwable t) {
-
+                //Transport level errors such as no internet etc.
             }
-
         });
+
+
     }
 
     private void showRetry(String error) {

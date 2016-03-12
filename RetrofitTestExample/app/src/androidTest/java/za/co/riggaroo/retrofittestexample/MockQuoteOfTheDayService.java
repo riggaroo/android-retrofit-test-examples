@@ -3,6 +3,7 @@ package za.co.riggaroo.retrofittestexample;
 import java.util.ArrayList;
 
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.mock.BehaviorDelegate;
 import za.co.riggaroo.retrofittestexample.pojo.Contents;
 import za.co.riggaroo.retrofittestexample.pojo.Quote;
